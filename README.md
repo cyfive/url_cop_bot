@@ -1,19 +1,7 @@
-# TLG_JoinCaptchaBot
-
-<p align="center">
-    <img width="100%" height="100%" src="https://gist.githubusercontent.com/J-Rios/05d7a8fc04166fa19f31a9608033d10b/raw/32dee32a530c0a0994736fe2d02a1747478bd0e3/captchas.png">
-</p>
+# URL Peace officer
 
 Telegram Bot to verify if a new member joining a group is a human.
 Upon a new user join a group, the Bot send an image-based [captcha challenge](https://en.wikipedia.org/wiki/CAPTCHA) that must be solved to allow the user stay in the group. If the new user fails to solve the captcha within a set time limit, they are removed from the group. Additionally, any message from a new user that includes a URL prior to the completion of the captcha will be considered Spam and will be deleted.
-
-## Donate
-
-Do you like this Bot? Buy me a coffee :)
-
-Paypal:
-
-[https://www.paypal.me/josrios](https://www.paypal.me/josrios)
 
 ## Installation
 
@@ -31,8 +19,8 @@ To generate Captchas, the Bot uses [multicolor_captcha_generator library](https:
 2. Get and setup the project:
 
     ```bash
-    git clone https://github.com/J-Rios/TLG_JoinCaptchaBot
-    cd TLG_JoinCaptchaBot
+    git clone https://github.com/cyfive/url_cop_bot.git
+    cd url_cop_bot
     make setup
     ```
 
@@ -84,7 +72,7 @@ For systemd based systems, you can setup the Bot as daemon service.
 To do that, you need to create a new service description file for the Bot as follow:
 
 ```bash
-[vim or nano] /etc/systemd/system/tlg_joincaptcha_bot.service
+[vim or nano] /etc/systemd/system/url_cop_bot.service
 ```
 
 File content:
@@ -97,9 +85,9 @@ After=network-online.target
 
 [Service]
 Type=forking
-WorkingDirectory=/path/to/TLG_JoinCaptchaBot/src/
-ExecStart=/path/to/TLG_JoinCaptchaBot/tools/run
-ExecReload=/path/to/TLG_JoinCaptchaBot/tools/kill
+WorkingDirectory=/path/to/url_cop_bot/src/
+ExecStart=/path/to/url_cop_bot/tools/run
+ExecReload=/path/to/url_cop_bot/tools/kill
 
 [Install]
 WantedBy=multi-user.target
@@ -108,25 +96,25 @@ WantedBy=multi-user.target
 Then, to add the new service into systemd, you should enable it:
 
 ```bash
-systemctl enable --now tlg_joincaptcha_bot.service
+systemctl enable --now url_cop_bot.service
 ```
 
 Now, you can start the service (Bot) by:
 
 ```bash
-systemctl start tlg_joincaptcha_bot.service
+systemctl start url_cop_bot.service
 ```
 
 You can check if the service (Bot) is running by:
 
 ```bash
-systemctl status tlg_joincaptcha_bot.service
+systemctl status url_cop_bot.service
 ```
 
 Remember that, if you wan't to disable it, you should execute:
 
 ```bash
-systemctl disable tlg_joincaptcha_bot.service
+systemctl disable url_cop_bot.service
 ```
 
 ## Docker
@@ -140,7 +128,7 @@ The **Bot Owner** can run special commands that no one else can use, like /allow
 You can setup a Bot Owner by specifying the Telegram User ID or Alias in "settings.py" file. For example:
 
 ```python
-"BOT_OWNER": "@JoseTLG",
+"BOT_OWNER": "@you_tg_alias",
 ```
 
 ## Make Bot Private
@@ -180,7 +168,7 @@ Once you have the key and cert files, setup the next lines in "settings.py" file
 (Optional) In case you want to use a reverse proxy between Telegram Server and the system that runs the Bot, you need to setup the Proxy Webhook URL setting:
 
 ```python
-"WEBHOOK_URL": "https://example.com:8443/TLG_JoinCaptchaBot"
+"WEBHOOK_URL": "https://example.com:8443/url-cop-bot"
 ```
 
 Then, you need to change Bot connection mode from polling to webhook by setting to True the next configuration:
@@ -203,7 +191,7 @@ To add support for a new language you must follow this steps:
 
 1. Fork the project repository, clone it and create a new branch to work on it (i.e. named language-support-en).
 
-2. Copy from one of the existing language JSON files from [here](https://github.com/J-Rios/TLG_JoinCaptchaBot/tree/master/src/language) to a new one.
+2. Copy from one of the existing language JSON files from [here](https://github.com/cyfive/url_cop_bot/tree/master/src/language) to a new one.
 
 3. Change the name of that file for the language ISO Code of the language that you want.
 

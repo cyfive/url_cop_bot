@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ $# -gt 0 ]; then
+    $@
+    exit $?
+fi
+
 # Actual script directory path
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
@@ -7,4 +12,4 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 rm -f $DIR/../src/data/captchas/*
 
 # Launch the Bot
-exec python3 -u $DIR/../src/join_captcha_bot.py
+python3 -u $DIR/../src/join_captcha_bot.py

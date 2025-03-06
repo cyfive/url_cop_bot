@@ -57,8 +57,7 @@ RUN git clone ${GITHUB_URL} ${APP_DIR} && \
     cd ${APP_DIR}/src && \
     chown -cR ${BOT_USER}:${BOT_GROUP} ${BOT_HOME_DIR} && \
     rm -rf ${BOT_HOME_DIR}/.cache && \
-    find ${APP_DIR} -iname '.git*' -print0 | xargs -0 -r -t rm -rf && \
-    chmod +x ${APP_DIR}/tools/entrypoint.sh
+    find ${APP_DIR} -iname '.git*' -print0 | xargs -0 -r -t rm -rf
 
 ################################################################################
 
@@ -72,9 +71,10 @@ COPY --from=builder ${BOT_HOME_DIR} ${BOT_HOME_DIR}
 
 # Adjust privileges
 RUN chown -R "${BOT_USER}:${BOT_GROUP}" ${BOT_HOME_DIR} && \
-    usermod -d ${BOT_HOME_DIR} ${BOT_USER}
+    usermod -d ${BOT_HOME_DIR} ${BOT_USER} && \
+    chmod +x ${APP_DIR}/tools/entrypoint.sh
 
 # Set up to run as an unprivileged user
 USER ${BOT_USER}
 WORKDIR ${APP_DIR}
-CMD ["./tools/entrypoint.sh"]
+ENTRYPOINT ["./tools/entrypoint.sh"]
