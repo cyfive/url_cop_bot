@@ -1,48 +1,25 @@
+.PHONY:	prepare build publish clean
 
-SHELL = /bin/bash
-TOOLS="./tools"
+PULL_DOCKER_REPO ?= docker.io
+PUSH_DOCKER_REPO ?= please-set-registry
+DOCKER_REPO_USER ?= please-set-user-name
+DOCKER_REPO_PASS ?= please-set-password
 
-.PHONY: help run kill status monitor errors
+VERSION ?= 1.0.0
 
-help:
-	@ echo ""
-	@ echo "Usage:"
-	@ echo "  setup: Setup Project"
-	@ echo "  run: Launch the Bot"
-	@ echo "  kill: Stop the Bot"
-	@ echo "  status: Check if Bot is running"
-	@ echo "  monitor: Check users captcha process"
-	@ echo "  error: Check for errors in the Bot"
-	@ echo ""
+prepare:
+	echo ${DOCKER_REPO_PASS} | podman login ${PUSH_DOCKER_REPO} -u ${DOCKER_REPO_USER} --password-stdin
 
-setup:
-	@ chmod +x $(TOOLS)/setup
-	@ $(TOOLS)/setup
+build:
+	podman build --network host . \
+		-t ${PUSH_DOCKER_REPO}/url-cop-bot:${VERSION} \
+		-t ${PUSH_DOCKER_REPO}/url-cop-bot:latest \
+		--build-arg DOCKER_REPO=${PULL_DOCKER_REPO}
 
-run:
-	@ chmod +x $(TOOLS)/run
-	@ $(TOOLS)/run
+publish: prepare
+	podman push ${PUSH_DOCKER_REPO}/url-cop-bot:${VERSION}
+	podman push ${PUSH_DOCKER_REPO}/url-cop-bot:latest
 
-kill:
-	@ chmod +x $(TOOLS)/kill
-	@ $(TOOLS)/kill
-
-status:
-	@ chmod +x $(TOOLS)/status
-	@ $(TOOLS)/status
-
-monitor:
-	@ chmod +x $(TOOLS)/monitor
-	@ $(TOOLS)/monitor
-
-errors:
-	@ chmod +x $(TOOLS)/check_errors
-	@ $(TOOLS)/check_errors
-
-catcfgchat:
-	@ chmod +x $(TOOLS)/catcfgchat
-	@ $(TOOLS)/catcfgchat
-
-stats:
-	@ chmod +x $(TOOLS)/stats
-	@ $(TOOLS)/stats
+clean:
+	podman image rm ${PUSH_DOCKER_REPO}/redis-benchmark:${VERSION}
+	podman image rm ${PUSH_DOCKER_REPO}/redis-benchmark:latest

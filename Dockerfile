@@ -1,23 +1,18 @@
-# This Dockerfile has buildkit syntax, to allow build steps to be cached
-# and speed up when rebuilding
+ARG DOCKER_REPO="localhost"
 
-FROM python:3.8.8-slim-buster AS base
+FROM ${DOCKER_REPO}/python:3.8.8-slim-buster AS base
 
 # Build ARGs
-ARG BOT_PROJECT="url-bot"
 ARG BOT_USER="nobody"
 ARG BOT_GROUP="nogroup"
 ARG BOT_HOME_DIR="/srv"
 ARG APP_DIR="${BOT_HOME_DIR}/app"
-ARG GITHUB_URL="https://github.com/cyfive/url_cop_bot.git"
 
 # Export ARGs as ENV vars so they can be shared among steps
-ENV BOT_PROJECT="${BOT_PROJECT}" \
-    BOT_USER="${BOT_USER}" \
+ENV BOT_USER="${BOT_USER}" \
     BOT_GROUP="${BOT_GROUP}" \
     BOT_HOME_DIR="${BOT_HOME_DIR}" \
     APP_DIR="${APP_DIR}" \
-    GITHUB_URL="${GITHUB_URL}" \
     DEBIAN_FRONTEND=noninteractive \
     APT_OPTS="-q=2 --no-install-recommends --yes"
 
@@ -33,7 +28,6 @@ FROM base AS builder-deps
 RUN apt-get ${APT_OPTS} update && \
     apt-get ${APT_OPTS} install \
     build-essential \
-    git \
     procps  \
     libtiff5-dev \
     libjpeg62-turbo-dev \
@@ -50,14 +44,17 @@ RUN apt-get ${APT_OPTS} update && \
 FROM builder-deps AS builder
 
 # Build the code as unprivileged user
-USER ${BOT_USER}
+#USER ${BOT_USER}
 WORKDIR ${BOT_HOME_DIR}
-RUN git clone ${GITHUB_URL} ${APP_DIR} && \
-    python3 -m pip install --user --requirement ${APP_DIR}/requirements.txt && \
-    cd ${APP_DIR}/src && \
+COPY src ${APP_DIR}/
+COPY tools ${APP_DIR}/tools
+COPY requirements.txt ${APP_DIR}/
+RUN python3 -m venv .venv && \
+#    source .venv/bin/activate && \
+    .venv/bin/python3 -m pip install --requirement ${APP_DIR}/requirements.txt && \
+    cd ${APP_DIR}/ && \
     chown -cR ${BOT_USER}:${BOT_GROUP} ${BOT_HOME_DIR} && \
-    rm -rf ${BOT_HOME_DIR}/.cache && \
-    find ${APP_DIR} -iname '.git*' -print0 | xargs -0 -r -t rm -rf
+    rm -rf ${BOT_HOME_DIR}/.cache
 
 ################################################################################
 
